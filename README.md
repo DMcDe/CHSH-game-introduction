@@ -1,2 +1,2 @@
 # CHSH-game-introduction
-Introduction to the CHSH game on qiskit (potentially on SeQUeNCe).
+Introduction to the CHSH game on qiskit. Simultation on quantum network simulator SeQUeNCe in progress but unfinished.
