@@ -316,11 +316,14 @@ class RefereeProtocol(Protocol):
 
         a_inp, b_inp = inp
 
-    # configurable mapping flips (±1↔{0,1} convention)
-        FLIP_ALICE = True
-        FLIP_BOB = True
-        a_res = (1 - res[0]) if FLIP_ALICE else res[0]
-        b_res = (1 - res[1]) if FLIP_BOB   else res[1]
+        # configurable mapping flips (±1↔{0,1} convention)
+        # FLIP_ALICE = True
+        # FLIP_BOB = True
+        # a_res = (1 - res[0]) if FLIP_ALICE else res[0]
+        # b_res = (1 - res[1]) if FLIP_BOB   else res[1]
+
+        a_res = res[0]
+        b_res = res[1]
 
         target = a_inp & b_inp
         win = (a_res ^ b_res) == target
@@ -340,32 +343,6 @@ class RefereeProtocol(Protocol):
         assert self.result is not None, 'Result was NoneType. Has the game finished?'
         return self.result
 
-    # def compute_chsh_s(self):
-    #     def expectation(counts):
-    #         total = sum(counts.values())
-    #         e = 0
-    #         for outcome, count in counts.items():
-    #         # Handle tuple (0,1) or string "01"
-    #             if isinstance(outcome, str):
-    #                 a, b = int(outcome[0]), int(outcome[1])
-    #             else:
-    #                 a, b = outcome
-    #             if a == b:
-    #                 e += count
-    #             else:
-    #                 e -= count
-    #         if total == 0:
-    #             return 0
-    #         val = e / total
-    #         if abs(val) > 1.0:
-    #             print(f"[WARNING] Clipping E = {val} to [-1, 1]")
-    #         return max(min(val, 1.0), -1.0)
-
-    #     E = {k: expectation(v) for k, v in self.results.items()}
-    #     # for k, val in E.items():
-    #     #     print(f"E[{k}] = {val:.4f}")
-    #     S = abs(E[(0, 0)] + E[(0, 1)] + E[(1, 0)] - E[(1, 1)])
-    #     return S
     def compute_chsh_s(self):
         def expectation(counts):
             total = sum(counts.values())
@@ -388,25 +365,25 @@ class RefereeProtocol(Protocol):
             return max(min(val, 1.0), -1.0)
 
         E = {k: expectation(v) for k, v in self.results.items()}
-        S = E[(0, 0)] + E[(0, 1)] + E[(1, 0)] - E[(1, 1)]
+        S = abs(E[(0, 0)] + E[(0, 1)] + E[(1, 0)] - E[(1, 1)])
 
     # --- Added: per-setting and global winrate logging ---
-        total_rounds = 0
-        total_wins = 0
-        print("\n[CHSH Stats]")
-        for k, counts in self.results.items():
-            total = sum(counts.values())
-            wins = sum(
-            count for outcome, count in counts.items()
-            if (int(outcome[0]) ^ int(outcome[1])) == (k[0] & k[1])
-            )
-            total_rounds += total
-            total_wins += wins
-            winrate_xy = wins / total if total else 0
-            print(f"  Setting {k}: E = {E[k]:.3f}, winrate = {winrate_xy:.3f}, rounds = {total}")
+        # total_rounds = 0
+        # total_wins = 0
+        # print("\n[CHSH Stats]")
+        # for k, counts in self.results.items():
+        #     total = sum(counts.values())
+        #     wins = sum(
+        #     count for outcome, count in counts.items()
+        #     if (int(outcome[0]) ^ int(outcome[1])) == (k[0] & k[1])
+        #     )
+        #     total_rounds += total
+        #     total_wins += wins
+        #     winrate_xy = wins / total if total else 0
+        #     print(f"  Setting {k}: E = {E[k]:.3f}, winrate = {winrate_xy:.3f}, rounds = {total}")
 
-        global_winrate = total_wins / total_rounds if total_rounds else 0
-        print(f"Global S = {S:.4f}, Global winrate = {global_winrate:.4f}\n")
+        # global_winrate = total_wins / total_rounds if total_rounds else 0
+        # print(f"Global S = {S:.4f}, Global winrate = {global_winrate:.4f}\n")
     # -----------------------------------------------------
 
         return S
